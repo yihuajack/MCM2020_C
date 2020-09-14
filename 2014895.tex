@@ -1,0 +1,142 @@
+\documentclass[12pt]{mcmthesis}
+\mcmsetup{CTeX = false,
+        tcn = 2014895, problem = C,
+        sheet = true, titleinsheet = true, keywordsinsheet = true,
+        titlepage = true}
+\usepackage{palatino}
+\usepackage{mwe}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{indentfirst}
+\usepackage{gensymb}
+\usepackage[ruled,lined,commentsnumbered]{algorithm2e}
+\usepackage{geometry}
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+\setlength{\parindent}{2em}
+\begin{document}
+\linespread{0.6}
+\setlength{\parskip}{0.5\baselineskip}
+\title{Online Shopping data Analyze}
+
+\date{}
+\begin{abstract}
+    \begin{keywords}
+    
+    
+    \end{keywords}
+\end{abstract}
+
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+
+\section{Introduction}
+
+\subsection{Problem Background}
+Online shopping is a popular shopping method for people nowadays. While the form of online shopping has gradually got popular, there are some online shopping platforms appearing, such as Amazon. They gather up these online shops and offer a complete after-sale system for customers. After purchasing goods online, customers can write short reviews for the goods they get. They can also give star ratings of which the value is among 1 and 5 (1 means low rated, low satisfaction, while 5 means high rated, high satisfaction). The company can analyze these data to adjust their goods quality and shopping strategy.
+
+
+In this problem, the Sunshine Company hired our team to analyze the online shopping data for their three products: a microwave oven, a baby pacifier and a hair dryer. Via analyzing the data, we will offer some suggestions on shopping strategy and product design.
+
+\subsection{Our Work}
+To address the problem, we first process the data by deleting reviews with missing information. Then we analyze the data by multiple models. For each customer's review, we built a evaluation system to decide whether their suggestions are important. Our evaluation system is built up on three parts of data: review length, star rating and vine. To calculate the predicting value in six months, we used ARMA model. For the reviews in the data, we utilize `The ColemaneLiau method' to judge their readability. After deleting some unreadable reviews, we counted the word number for each reviews to represent their importance to our analyze. Then we used textblob to do emotional analyze for the reviews.
+
+In Section \ref{Sec-Assume}, we state several basic assumptions. Section \ref{Sec-Nomen} contains the nomenclature used in model statement. Section \ref{Sec-Model} provides sufficient details about our model. Section \ref{Sec-Implementation} carries out experiment and analysis about our proposed model. Section \ref{Sec-Strategy} provides detailed strategies dealing with several conditions. At last, we further study our model in Section \ref{Sec-Analysis} and make some conclusions in Section \ref{Sec-Conclusion}.
+\section{Assumptions}\label{Sec-Assume}
+Our model makes the following assumptions:
+\begin{itemize}
+    \item \textbf{Moderate reviews are more helpful than extreme reviews.}
+    \item \textbf{Reviews with longer text have a positive effect on the perceived usefulness of the reviews.}
+\end{itemize}
+\section{Nomenclature}\label{Sec-Nomen}
+The Nomenclature in this paper are written in the following table:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|c}
+    \hline
+        $\beta_1,...,\beta_7$  & Weight parameters for helpfulness evaluation \\
+        \hline
+        \text{star\_rating}   &  Star ratings given by the customer \\
+        \hline
+        \text{word\_count}   & The total word number of the reviews given by the customer \\
+        \hline
+        \text{total\_votes}   & Number of the total votes the review received \\
+	    \hline
+		Vine&Whether the reviewer is as Amazon Vine Voices\\
+		\hline
+		review\_readability&The readability of a review\\
+		\hline
+		review\_year&The year when the review is published\\
+		\hline
+    \end{tabular}
+    \caption{Nomenclature}
+\end{table}
+\clearpage
+\section{Statement of our Model} \label{Sec-Model}
+\subsection{Helpfulness Evaluation System}
+First, we analyzed the helpfulness for all of the reviews since there are many reviews are not so important as other ones. Our formula can be written as follows:
+\begin{equation}
+\begin{aligned}
+&\text{helpfulness}=\beta_1\cdot\text{star\_rating}+\beta_2\cdot(\text{star\_rating})^2+\beta_3\cdot\ln{\text{word\_count}}+\beta_4\cdot\ln{(\text{total\_votes}+1)}\\
+&+\beta_5\cdot\text{Vine}+\beta_6\cdot\text{review\_readability}+\beta_7\cdot(\text{review\_year}-\alpha).\\
+\end{aligned}
+\end{equation}
+Besides, we regulate the value of `Vine' as follows:
+$$\text{Vine}=\left\{\begin{aligned}
+    0\qquad\text{(Vine is N)}\\
+    1\qquad\text{(Vine is Y)}
+\end{aligned}
+\right .$$
+\subsection{Analysis of emotion}
+Then we did the emotional analysis to the reviews of the three products by utilizing the sentiment method in textblob. We can view the results of our emotional analysis in our conclusion part.
+\subsection{Time-based measures and patterns}
+To identify the time-based patterns of the product sales, we constructed ARMA model to predict the product sale in the future six months. Our steps are as follows:
+\begin{enumerate}
+    \item We used `is\_stationary\_series' function to check the stability of the series.
+    \item Since the result turned out to be 1, we directly built ARMA model rather than calculate difference ARIMA.
+    \item Then we used armax test AIC with p=0:3 and q=0:3. Take the minimum of AIC such that p=3 and q=3. We calculated ARMA(3,3) and took residual test. The results are shown in a residual map.
+    \item After that, we did Ljung-Box test to the residual vector. We forecast the prediction value in six months.
+    \item Since the results of Ljung-Box test shows that h=0, we concluded that the residual is self-correlation. This means that our model can simulate the real situation.
+\end{enumerate}
+The prediction values in 6 months are shown in the table below.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Month&Hair\_Dryer&Microwave&Pacifier\\
+		\hline
+		1&3.8386&3.4846&3.5610\\
+		\hline
+		2&3.8610&3.9517&3.5610\\
+		\hline
+		3&3.8149&3.6672&3.5609\\
+		\hline
+		4&3.8531&3.0927&3.5609\\
+		\hline
+		5&3.8482&3.1408&3.5608\\
+		\hline
+		6&3.8169&3.7249&3.5608\\
+		\hline
+	\end{tabular}
+	\caption{Reputation prediction of the three products in 6 months.}
+\end{table}
+\section{Model Analysis}\label{Sec-Analysis}
+\subsection{Strengths and Weaknesses}
+\subsubsection{Strengths}
+\subsubsection{Weaknesses}
+\section{Conclusion} \label{Sec-Conclusion}
+\newpage
+\section{Reference}
+    \begin{enumerate}[1.]
+        \item Coleman, M., Liau, T. L. (1975). A computer readability formula designed for machine scoring. Journal of Applied Psychology, 60(2), 283e284.
+        \item Mudambi, S. M., Schuff, D. (2010). What makes a helpful online review? A study of customer reviews on Amazon.com. MIS Quarterly, 34(1), 185e200.
+        \item Zhiwei Liu, Park Sangwon. (2015). What makes a useful online review? Implication for travel product websites. Tourism Management, 47 (2015), 140e151.
+    \end{enumerate}
+\section*{Letter}
+\end{document}

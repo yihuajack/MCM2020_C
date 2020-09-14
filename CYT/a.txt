@@ -1,0 +1,10 @@
+1.数据处理
+去除verified purchase为N的评论
+去除total vote为0的评论
+#星级和评论关联度处理，去除星级和评论不相符的数据
+2.线性加权
+Helpfulness=A x Rating + B x Word Count + C x Vine
+Helpfulness=Helpful vote/Total vote
+Vine=1(Y) or 0(N)
+regress计算出权重ABC，得到综合评价分数
+f=A x Rating + B x Word Count + C x Vine
